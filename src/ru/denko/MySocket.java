@@ -27,6 +27,8 @@ public class MySocket {
         InputStream in = socket.getInputStream();
         OutputStream out = socket.getOutputStream();
 
+        out.write(clientName.getBytes());
+
         Thread readServer = new Thread(() -> {
             while (true) {
                 try {
@@ -42,7 +44,7 @@ public class MySocket {
         readServer.start();
 
         Thread readConsole = new Thread(() -> {
-            byte[] buf = new byte[1024];
+//            byte[] buf = new byte[1024];
             char[] consoleBuf = new char[1024];
             //InputStream console = new BufferedInputStream(System.in);
             while (true) {
