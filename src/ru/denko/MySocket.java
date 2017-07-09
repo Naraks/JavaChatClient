@@ -11,6 +11,7 @@ public class MySocket {
     private final String host;
     private final int port;
     private final String clientName;
+    private int closed;
     private Logger logger = Logger.getLogger("MySocketLogger");
 
     public MySocket(String host, int port, String clientName) {
@@ -28,12 +29,16 @@ public class MySocket {
         OutputStream out = socket.getOutputStream();
 
         out.write(clientName.getBytes());
+        logger.log(Level.INFO, "Sending client name to server");
 
         Thread readServer = new Thread(() -> {
             while (true) {
                 try {
                     byte[] readBuf = new byte[1024];
-                    in.read(readBuf);
+                    closed = in.read(readBuf);
+                    if (closed == -1) {
+                        break;
+                    }
                     System.out.println("Server: " + new String(readBuf));
                 } catch (IOException e) {
                     System.out.println("Exception on Thread readServer");
@@ -48,6 +53,9 @@ public class MySocket {
             char[] consoleBuf = new char[1024];
             //InputStream console = new BufferedInputStream(System.in);
             while (true) {
+                if (closed == -1) {
+                    break;
+                }
                 try {
                     Reader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
                     bufferedReader.read(consoleBuf);
@@ -59,8 +67,7 @@ public class MySocket {
         });
         readConsole.start();
 
-
-        logger.log(Level.INFO, "client closed");
+        //logger.log(Level.INFO, "client closed");
     }
 
 }
