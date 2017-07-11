@@ -1,6 +1,9 @@
 package ru.denko;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.logging.Level;
@@ -50,16 +53,19 @@ public class MySocket {
 
         Thread readConsole = new Thread(() -> {
 //            byte[] buf = new byte[1024];
-            char[] consoleBuf = new char[1024];
             //InputStream console = new BufferedInputStream(System.in);
             while (true) {
                 if (closed == -1) {
                     break;
                 }
                 try {
-                    Reader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+                    byte[] consoleBuf = new byte[1024];
+                    byte[] to = new byte[128];
+                    InputStream bufferedReader = new BufferedInputStream(System.in);
+                    bufferedReader.read(to);
+                    out.write(to);
                     bufferedReader.read(consoleBuf);
-                    out.write(new String(consoleBuf).getBytes());
+                    out.write(consoleBuf);
                 } catch (IOException e) {
                     System.out.println("Exception in Thread readConsole");
                 }
