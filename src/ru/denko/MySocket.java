@@ -104,7 +104,12 @@ class MySocket {
 
     private String readFromConsole() throws IOException {
         Scanner scanner = new Scanner(System.in);
-        return scanner.nextLine();
+        String msg = scanner.nextLine();
+        if (msg.equals("EXIT")) {
+            writeToServer("EXIT");
+            socket.close();
+        }
+        return msg;
     }
 }
 
