@@ -1,7 +1,5 @@
 package ru.denko;
 
-import com.sun.istack.internal.NotNull;
-
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -9,14 +7,20 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-class MySocket {
+class Client implements Runnable {
 
     private final String clientName;
-    private Socket socket; //TODO подумать над final
+    private Socket socket;
 
     private Logger logger = Logger.getLogger("MySocketLogger");
 
-    MySocket(String host, int port, String clientName) {
+    /**
+     * Constructor
+     * @param host address of server
+     * @param port port of server
+     * @param clientName name of the attached client
+     */
+    Client(String host, int port, String clientName) {
         this.clientName = clientName;
         try {
             this.socket = new Socket(InetAddress.getByName(host), port);
@@ -27,11 +31,8 @@ class MySocket {
         logger.log(Level.INFO, "Set socket: host: " + host + " port: " + port + " name: " + clientName);
     }
 
-    void runSocket()  {
+    public void run()  {
         try {
-//            DataOutputStream d = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
-//            d.writeUTF(clientName);
-//            d.flush();
             writeToServer(clientName); //при создании клиента отправляем серверу имя клиента
         } catch (IOException e) {
             e.printStackTrace();
@@ -40,7 +41,7 @@ class MySocket {
 
         readServer();
         readConsole();
-        //logger.log(Level.INFO, "client closed");
+        logger.log(Level.INFO, "client closed");
     }
 
     private void readServer() {
@@ -72,7 +73,7 @@ class MySocket {
             while (true) {
                 try {
                     System.out.println("Напишите имя адресата:");
-                    nameTo = readFromConsole(); //читаем адресата сообщения
+                    nameTo = readFromConsole(); //читаем адресата сообщения, имя может быть null, тогда сервер рассылает сообщение всем клиентам
                     writeToServer(nameTo); //пишем серверу имя адресата
                     System.out.println("Напишите сообщение:");
                     msg = readFromConsole(); //читаем сообщение адресату
